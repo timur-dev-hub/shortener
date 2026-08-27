@@ -16,6 +16,6 @@ async def registration(register_data: UserRegister, response: Response):
     return {"massage": "reg FALSE"}
 
 @router.get("/login")
-async def login(token_payload = Depends(security.access_token_required)):
+async def login(login_data: LoginRegister):
 
     return {"massage": "login TRUE"}

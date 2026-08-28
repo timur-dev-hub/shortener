@@ -1,5 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from pwdlib import PasswordHash
+from uuid import UUID
 
 from app.schemas.user import UserRegister, UserLogin
 from app.db.models.user import User
@@ -47,4 +48,3 @@ async def login_user(
         return user
     else:
         raise InvalidUserData
-

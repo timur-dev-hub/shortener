@@ -24,7 +24,7 @@ async def create_short_link(session: AsyncSession, link: LinkCreate, user_id: UU
 
     url = Url(
         user_id=user_id,
-        target_url=link.target_url,
+        target_url=str(link.target_url),
         short_code=short_code
     )
 

@@ -17,6 +17,6 @@ class Url(Base):
     )
 
     target_url: Mapped[str]
-    short_url: Mapped[str]
+    short_code: Mapped[str]
     created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
 

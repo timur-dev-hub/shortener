@@ -2,7 +2,6 @@ from fastapi import APIRouter, Depends, status
 from fastapi.responses import RedirectResponse
 
 from app.schemas.schortener import LinkCreate, LinkResponse
-from app.api.dependencies import get_current_user
 
 from app.services.schortner import create_short_link
 
@@ -10,7 +9,7 @@ router = APIRouter()
 redirect_router = APIRouter()
 
 @router.post("/short_url", status_code=status.HTTP_201_CREATED)
-async def create_short_url(url_data: LinkCreate, current_user: dict = Depends(get_current_user)):
+async def create_short_url(url_data: LinkCreate):
     target_url = str(url_data.target_url)
 
     short_url_data = await create_short_link(target_url)

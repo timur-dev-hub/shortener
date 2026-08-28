@@ -1,21 +1,42 @@
-from fastapi import APIRouter, Response, Depends
+from fastapi import APIRouter, Response, Depends, status, HTTPException
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.security import security
-from app.schemas.user import UserRegister, LoginRegister
+from app.schemas.user import UserRegister, UserLogin, UserResponse
+
+from app.services.auth import register_user, login_user
+from app.api.dependencies import get_session
+
+from app.core.exceptions import InvalidUserData
+
 
 router = APIRouter()
 
-@router.post("/registration")
-async def registration(register_data: UserRegister, response: Response):
-    if register_data.email == "user@example.com":
+@router.post("/registration", status_code=status.HTTP_200_OK)
+async def registration(
+        register_data: UserRegister,
+        response: Response,
+        database_session: AsyncSession = Depends(get_session)
+):
+    user = await register_user(database_session, register_data)
+    token = security.create_access_token(str(user.id))
+    security.set_access_cookies(token, response)
 
-        token = security.create_access_token(uid="10881088")
+    return UserResponse.model_validate(user)
+
+@router.post("/login", status_code=status.HTTP_201_CREATED)
+async def login(
+        login_data: UserLogin,
+        response: Response,
+        database_session: AsyncSession = Depends(get_session)
+):
+    try:
+        user = await login_user(database_session, login_data)
+        token = security.create_access_token(str(user.id))
         security.set_access_cookies(token, response)
 
-        return {"massage": "reg TRUE"}
-    return {"massage": "reg FALSE"}
+        return UserResponse.model_validate(user)
+    except InvalidUserData:
+        raise HTTPException(status_code=401, detail="Incorrect username or password")
 
-@router.get("/login")
-async def login(login_data: LoginRegister):
 
-    return {"massage": "login TRUE"}

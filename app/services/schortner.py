@@ -6,8 +6,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from pwdlib import PasswordHash
 
 from app.db.models.url import Url
-from app.db.crud.url import create_entry_short_url
-from app.schemas.schortener import LinkCreate
+from app.db.crud.url import create_entry_short_url, get_target_url_by_short_code
+from app.schemas.schortener import LinkCreate, ShortCode
 
 async def generate_code(length: int = 12) -> str:
     characters = string.ascii_letters + string.digits
@@ -28,5 +28,8 @@ async def create_short_link(session: AsyncSession, link: LinkCreate, user_id: UU
     return await create_entry_short_url(session, url)
 
 
+async def redirect_url(session: AsyncSession, short_code: ShortCode) -> Url:
 
+    url_data = await get_target_url_by_short_code(session, short_code)
 
+    return url_data

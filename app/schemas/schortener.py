@@ -1,9 +1,12 @@
 from pydantic import BaseModel, HttpUrl, computed_field, Field, ConfigDict, TypeAdapter
 from datetime import datetime
+from typing import Annotated
 
 from app.core.config import settings
 
 http_url_adapter = TypeAdapter(HttpUrl)
+ShortCode = Annotated[str, Field(min_length=12, max_length=12)]
+
 class LinkCreate(BaseModel):
     target_url: HttpUrl
 
@@ -22,5 +25,5 @@ class LinkResponse(BaseModel):
     @property
     def short_url(self) -> str:
         return http_url_adapter.validate_python(
-            f"{settings.SERVICE_DOMAIN}/r/{self.short_code}"
+            f"{settings.SERVICE_DOMAIN}r/{self.short_code}"
         )

@@ -5,9 +5,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from uuid import UUID
 
 from app.api.dependencies import get_current_user_id, get_session
-from app.schemas.schortener import LinkCreate, LinkResponse
+from app.schemas.schortener import LinkCreate, LinkResponse, ShortCode
 
-from app.services.schortner import create_short_link
+from app.services.schortner import create_short_link, redirect_url
 
 
 router = APIRouter()
@@ -25,6 +25,11 @@ async def create_short_url(
 
 
 @redirect_router.get("/{short_code}")
-async def redirect(short_code: str):
+async def redirect(
+        short_code: ShortCode,
+        database_session: AsyncSession = Depends(get_session)
+):
 
-    return RedirectResponse(url=f"http://localhost:8000/{short_code}")
+    url = await redirect_url(database_session, short_code)
+
+    return RedirectResponse(url=url.target_url)

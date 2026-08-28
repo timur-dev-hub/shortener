@@ -1,13 +1,26 @@
-from pydantic import BaseModel, HttpUrl
+from pydantic import BaseModel, HttpUrl, computed_field, Field, ConfigDict, TypeAdapter
 from datetime import datetime
 
+from app.core.config import settings
 
+http_url_adapter = TypeAdapter(HttpUrl)
 class LinkCreate(BaseModel):
     target_url: HttpUrl
 
-class LinkResponse(LinkCreate):
+class LinkResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     target_url: HttpUrl
-    short_url: HttpUrl
-    created_at: datetime
 
+    short_code: str = Field(exclude=True)
+
+    created_at: datetime
+    clicks: int
+
+    @computed_field
+    @property
+    def short_url(self) -> str:
+        return http_url_adapter.validate_python(
+            f"{settings.SERVICE_DOMAIN}/r/{self.short_code}"
+        )

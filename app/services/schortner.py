@@ -28,7 +28,6 @@ async def create_short_link(session: AsyncSession, link: LinkCreate, user_id: UU
         short_code=short_code
     )
 
-
     return await create_entry_short_url(session, url)
 
 

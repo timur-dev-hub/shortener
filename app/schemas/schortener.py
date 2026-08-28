@@ -1,6 +1,6 @@
 from pydantic import BaseModel, HttpUrl, computed_field, Field, ConfigDict, TypeAdapter
 from datetime import datetime
-from typing import Annotated
+from typing import Annotated, List
 
 from app.core.config import settings
 
@@ -27,3 +27,8 @@ class LinkResponse(BaseModel):
         return http_url_adapter.validate_python(
             f"{settings.SERVICE_DOMAIN}r/{self.short_code}"
         )
+
+
+class UrlsResponse(BaseModel):
+    links: List[LinkResponse]
+

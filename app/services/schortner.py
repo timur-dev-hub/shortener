@@ -9,9 +9,6 @@ from app.db.models.url import Url
 from app.db.crud.url import create_entry_short_url
 from app.schemas.schortener import LinkCreate
 
-from app.core.exceptions import InvalidUserData
-
-
 async def generate_code(length: int = 12) -> str:
     characters = string.ascii_letters + string.digits
     return ''.join(random.choices(characters, k=length))

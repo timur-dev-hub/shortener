@@ -1,11 +1,11 @@
-from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import UUID
+from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import UUID, ForeignKey
 from datetime import datetime
 
 from app.db.database import Base
 
 
-class User(Base):
+class Url(Base):
     __tablename__ = "url"
 
     id: Mapped[int] = mapped_column(
@@ -13,7 +13,7 @@ class User(Base):
     )
     user_id: Mapped[UUID] = mapped_column(
         UUID(as_uuid=True),
-        relationship = relationship("user")
+        ForeignKey("user.id"),
     )
 
     target_url: Mapped[str]

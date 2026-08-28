@@ -2,7 +2,6 @@ from pydantic import BaseModel, HttpUrl
 from datetime import datetime
 
 
-
 class LinkCreate(BaseModel):
     target_url: HttpUrl
 

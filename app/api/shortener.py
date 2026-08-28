@@ -7,8 +7,8 @@ from uuid import UUID
 from app.api.dependencies import get_current_user_id, get_session
 from app.schemas.schortener import LinkCreate, LinkResponse, ShortCode, UrlsResponse
 
-from app.services.schortner import create_short_link, redirect_url, get_all_short_urls
-from app.core.exceptions import AlreadyExists
+from app.services.schortner import create_short_link, redirect_url, get_all_short_urls, delete_redirect_url
+from app.core.exceptions import AlreadyExists, NotFound
 
 router = APIRouter()
 redirect_router = APIRouter()
@@ -36,6 +36,16 @@ async def get_short_urls(
     return UrlsResponse.model_validate({"links": urls})
 
 
+@router.delete("/short_url", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_redirect(
+        short_code: ShortCode,
+        database_session: AsyncSession = Depends(get_session),
+        user_id: UUID = Depends(get_current_user_id)
+):
+    try:
+        await delete_redirect_url(database_session, short_code, user_id)
+    except NotFound:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
 @redirect_router.get("/{short_code}")
 async def redirect(

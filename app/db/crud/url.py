@@ -1,4 +1,4 @@
-from sqlalchemy import select
+from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
 
@@ -17,6 +17,17 @@ async def create_entry_short_url(session: AsyncSession, url: Url) -> Url:
     except IntegrityError:
         await session.rollback()
         raise
+
+async def delete_entry_short_url(session: AsyncSession, short_code: ShortCode, user_id: UUID) -> bool:
+    stmt = delete(Url).where(Url.user_id == user_id).where(Url.short_code == short_code)
+    result = await session.execute(stmt)
+
+    if result.rowcount == 0:
+        return False
+    else:
+        await session.commit()
+        return True
+
 
 async def check_exist_target_url(session: AsyncSession, user_id: UUID, target_url: str) -> Url | None:
     stmt = select(Url).where(Url.user_id == user_id).where(Url.target_url == target_url)

@@ -4,3 +4,6 @@ class InvalidUserData(Exception):
 
 class AlreadyExists(Exception):
     pass
+
+class NotFound(Exception):
+    pass

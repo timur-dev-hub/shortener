@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, status, HTTPException
 from fastapi.responses import RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -8,7 +8,7 @@ from app.api.dependencies import get_current_user_id, get_session
 from app.schemas.schortener import LinkCreate, LinkResponse, ShortCode, UrlsResponse
 
 from app.services.schortner import create_short_link, redirect_url, get_all_short_urls
-
+from app.core.exceptions import AlreadyExists
 
 router = APIRouter()
 redirect_router = APIRouter()
@@ -19,9 +19,11 @@ async def create_short_url(
         database_session: AsyncSession = Depends(get_session),
         user_id: UUID = Depends(get_current_user_id)
 ):
-
-    url_data = await create_short_link(database_session, url_data, user_id)
-    return LinkResponse.model_validate(url_data)
+    try:
+        url_data = await create_short_link(database_session, url_data, user_id)
+        return LinkResponse.model_validate(url_data)
+    except AlreadyExists:
+        raise HTTPException(500, "Error short url create")
 
 @router.get("/short_url", status_code=status.HTTP_200_OK)
 async def get_short_urls(

@@ -7,7 +7,7 @@ from sqlalchemy.exc import IntegrityError
 
 
 from app.db.models.url import Url
-from app.db.crud.url import create_entry_short_url, get_target_url_by_short_code, get_all_short_urls_by_user_id
+from app.db.crud.url import create_entry_short_url, get_target_url_by_short_code, get_all_short_urls_by_user_id, check_exist_target_url
 from app.schemas.schortener import LinkCreate, ShortCode
 from app.core.exceptions import AlreadyExists
 
@@ -18,6 +18,10 @@ async def generate_code(length: int = 12) -> str:
 
 async def create_short_link(session: AsyncSession, link: LinkCreate, user_id: UUID) -> Url:
 
+    short_url = await check_exist_target_url(session, user_id, str(link.target_url))
+
+    if short_url:
+        return short_url
 
     for _ in range(10):
 

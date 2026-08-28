@@ -13,7 +13,7 @@ class UserResponse(BaseModel):
 
     id: UUID
     username: str
-    email: EmailStr
+
 
 
 class UserLogin(BaseModel):

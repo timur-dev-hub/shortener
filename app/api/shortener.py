@@ -53,6 +53,9 @@ async def redirect(
         database_session: AsyncSession = Depends(get_session)
 ):
 
-    url = await redirect_url(database_session, short_code)
+    try:
+        url = await redirect_url(database_session, short_code)
 
-    return RedirectResponse(url=url.target_url)
+        return RedirectResponse(url=url.target_url)
+    except NotFound:
+        return RedirectResponse(url="/")

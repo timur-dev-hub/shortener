@@ -1,3 +1,4 @@
+from pydantic import HttpUrl
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from pathlib import Path
@@ -6,6 +7,8 @@ BASE_DIR = Path(__file__).resolve().parents[2]
 
 class Settings(BaseSettings):
     JWT_SECRET_KEY: str
+
+    SERVICE_DOMAIN: HttpUrl
 
     DB_USER: str
     DB_PASS: str

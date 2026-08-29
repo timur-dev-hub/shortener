@@ -1,14 +1,14 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, status, HTTPException
 from fastapi.responses import RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from uuid import UUID
 
 from app.api.dependencies import get_current_user_id, get_session
-from app.schemas.schortener import LinkCreate, LinkResponse, ShortCode
+from app.schemas.schortener import LinkCreate, LinkResponse, ShortCode, UrlsResponse
 
-from app.services.schortner import create_short_link, redirect_url
-
+from app.services.schortner import create_short_link, redirect_url, get_all_short_urls, delete_redirect_url
+from app.core.exceptions import AlreadyExists, NotFound
 
 router = APIRouter()
 redirect_router = APIRouter()
@@ -19,10 +19,33 @@ async def create_short_url(
         database_session: AsyncSession = Depends(get_session),
         user_id: UUID = Depends(get_current_user_id)
 ):
+    try:
+        url_data = await create_short_link(database_session, url_data, user_id)
+        return LinkResponse.model_validate(url_data)
+    except AlreadyExists:
+        raise HTTPException(500, "Error short url create")
 
-    url_data = await create_short_link(database_session, url_data, user_id)
-    return LinkResponse.model_validate(url_data)
+@router.get("/short_url", status_code=status.HTTP_200_OK)
+async def get_short_urls(
+        database_session: AsyncSession = Depends(get_session),
+        user_id: UUID = Depends(get_current_user_id)
+):
 
+    urls = await get_all_short_urls(database_session, user_id)
+
+    return UrlsResponse.model_validate({"links": urls})
+
+
+@router.delete("/short_url", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_redirect(
+        short_code: ShortCode,
+        database_session: AsyncSession = Depends(get_session),
+        user_id: UUID = Depends(get_current_user_id)
+):
+    try:
+        await delete_redirect_url(database_session, short_code, user_id)
+    except NotFound:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
 @redirect_router.get("/{short_code}")
 async def redirect(
@@ -30,6 +53,9 @@ async def redirect(
         database_session: AsyncSession = Depends(get_session)
 ):
 
-    url = await redirect_url(database_session, short_code)
+    try:
+        url = await redirect_url(database_session, short_code)
 
-    return RedirectResponse(url=url.target_url)
+        return RedirectResponse(url=url)
+    except NotFound:
+        return RedirectResponse(url="/")

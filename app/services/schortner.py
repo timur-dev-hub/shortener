@@ -3,11 +3,18 @@ import string
 from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
-from pwdlib import PasswordHash
+from sqlalchemy.exc import IntegrityError
+
 
 from app.db.models.url import Url
-from app.db.crud.url import create_entry_short_url, get_target_url_by_short_code
+from app.db.crud.url import (create_entry_short_url, get_target_url_by_short_code,
+                             get_all_short_urls_by_user_id, check_exist_target_url,
+                             delete_entry_short_url)
+
+from app.cache.cache import Redis_Cache
+
 from app.schemas.schortener import LinkCreate, ShortCode
+from app.core.exceptions import AlreadyExists, NotFound
 
 async def generate_code(length: int = 12) -> str:
     characters = string.ascii_letters + string.digits
@@ -16,20 +23,56 @@ async def generate_code(length: int = 12) -> str:
 
 async def create_short_link(session: AsyncSession, link: LinkCreate, user_id: UUID) -> Url:
 
-    short_code = await generate_code()
+    short_url = await check_exist_target_url(session, user_id, str(link.target_url))
 
+    if short_url:
+        return short_url
 
-    url = Url(
-        user_id=user_id,
-        target_url=str(link.target_url),
-        short_code=short_code
-    )
+    for _ in range(10):
 
-    return await create_entry_short_url(session, url)
+        short_code = await generate_code()
 
+        try:
+            url = Url(
+                user_id=user_id,
+                target_url=str(link.target_url),
+                short_code=short_code
+            )
+            return await create_entry_short_url(session, url)
 
-async def redirect_url(session: AsyncSession, short_code: ShortCode) -> Url:
+        except IntegrityError:
+            continue
+
+    raise AlreadyExists
+
+async def redirect_url(session: AsyncSession, short_code: ShortCode) -> str:
+
+    url = await Redis_Cache.get_url(short_code)
+    if url:
+        return url
 
     url_data = await get_target_url_by_short_code(session, short_code)
+    if not url_data:
+        raise NotFound
 
-    return url_data
+    await Redis_Cache.set_url(short_code, url_data.target_url)
+    return url_data.target_url
+
+
+async def get_all_short_urls(session: AsyncSession, user_id: UUID) -> list[Url]:
+
+    all_short_urls = await get_all_short_urls_by_user_id(session, user_id)
+
+    return all_short_urls
+
+async def delete_redirect_url(session: AsyncSession, short_code: ShortCode, user_id: UUID) -> None:
+
+    result = await delete_entry_short_url(session, short_code, user_id)
+
+    await Redis_Cache.delete_url(short_code)
+
+    if not result:
+        raise NotFound
+
+
+

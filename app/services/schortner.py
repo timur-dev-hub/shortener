@@ -47,6 +47,7 @@ async def redirect_url(session: AsyncSession, short_code: ShortCode) -> Url:
     url_data = await get_target_url_by_short_code(session, short_code)
     if not url_data:
         raise NotFound
+
     return url_data
 
 async def get_all_short_urls(session: AsyncSession, user_id: UUID) -> list[Url]:

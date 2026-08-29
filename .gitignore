@@ -222,8 +222,10 @@ __marimo__/
 
 
 
-redis.py
+r1edis.py
 schematics.py
 test.py
 .idea
 init.py
+
+front-end/

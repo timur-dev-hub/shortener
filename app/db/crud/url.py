@@ -1,4 +1,4 @@
-from sqlalchemy import select, delete
+from sqlalchemy import select, delete, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
 
@@ -28,19 +28,30 @@ async def delete_entry_short_url(session: AsyncSession, short_code: ShortCode, u
         await session.commit()
         return True
 
-
 async def check_exist_target_url(session: AsyncSession, user_id: UUID, target_url: str) -> Url | None:
     stmt = select(Url).where(Url.user_id == user_id).where(Url.target_url == target_url)
     result = await session.execute(stmt)
 
     return result.scalars().one_or_none()
 
-
-
 async def get_target_url_by_short_code(session: AsyncSession, short_code: ShortCode) -> Url:
     stmt = select(Url).where(Url.short_code == short_code)
     result = await session.execute(stmt)
-    return result.scalars().one_or_none()
+    result = result.scalars().one_or_none()
+    if result:
+        await add_click_by_short_code(session, short_code)
+
+    return result
+
+async def add_click_by_short_code(session: AsyncSession, short_code: ShortCode) -> None:
+    stmt = (
+        update(Url)
+        .where(Url.short_code == short_code)
+        .values(clicks=Url.clicks + 1)
+    )
+
+    await session.execute(stmt)
+    await session.commit()
 
 async def get_all_short_urls_by_user_id(session: AsyncSession, user_id: UUID) -> list[Url]:
     stmt = select(Url).where(Url.user_id == user_id)
@@ -48,4 +59,5 @@ async def get_all_short_urls_by_user_id(session: AsyncSession, user_id: UUID) ->
     result = await session.execute(stmt)
 
     return result.scalars().all()
+
 

@@ -1,7 +1,6 @@
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from pwdlib import PasswordHash
-from uuid import UUID
 
 from app.schemas.user import UserRegister, UserLogin
 from app.db.models.user import User
@@ -38,18 +37,16 @@ async def register_user(
 
 async def login_user(
     session: AsyncSession,
-    data: UserLogin
+    input_data: UserLogin
 ):
-    email = data.email
+    email = input_data.email
 
     user = await get_user_by_email(session, email)
 
     if not user:
         raise InvalidUserData
 
-    hashed_password = await get_hashed_password(data.password)
-
-    if password_hash.verify(data.password, hashed_password):
+    if password_hash.verify(input_data.password, user.password):
         return user
     else:
         raise InvalidUserData

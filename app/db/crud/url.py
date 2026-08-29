@@ -38,9 +38,6 @@ async def get_target_url_by_short_code(session: AsyncSession, short_code: ShortC
     stmt = select(Url).where(Url.short_code == short_code)
     result = await session.execute(stmt)
     result = result.scalars().one_or_none()
-    if result:
-        await add_click_by_short_code(session, short_code)
-
     return result
 
 async def add_click_by_short_code(session: AsyncSession, short_code: ShortCode) -> None:

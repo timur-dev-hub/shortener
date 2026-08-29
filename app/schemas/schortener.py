@@ -23,7 +23,7 @@ class LinkResponse(BaseModel):
 
     @computed_field
     @property
-    def short_url(self) -> str:
+    def short_url(self) -> HttpUrl:
         return http_url_adapter.validate_python(
             f"{settings.SERVICE_DOMAIN}r/{self.short_code}"
         )

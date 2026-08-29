@@ -56,6 +56,6 @@ async def redirect(
     try:
         url = await redirect_url(database_session, short_code)
 
-        return RedirectResponse(url=url.target_url)
+        return RedirectResponse(url=url)
     except NotFound:
         return RedirectResponse(url="/")

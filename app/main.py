@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 
+from core.lifespan import lifespan
 
 from app.api.users import router as user_router
 from app.api.shortener import router as shortener_router
@@ -7,7 +8,8 @@ from app.api.shortener import redirect_router as redirect_router
 
 app = FastAPI(
     title="Link shortener",
-    version="0.0.1"
+    version="0.0.1",
+    lifespan=lifespan,
 )
 
 app.include_router(

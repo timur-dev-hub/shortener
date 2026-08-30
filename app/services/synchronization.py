@@ -16,5 +16,8 @@ async def redis_clicks_synchronization():
     for i in clicks_count:
         clicks.update(i)
 
+    if not clicks:
+        return
+
     async with async_session() as session:
         await upd_click_by_short_code(session, clicks)

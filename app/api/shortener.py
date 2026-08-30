@@ -23,7 +23,7 @@ async def create_short_url(
         url_data = await create_short_link(database_session, url_data, user_id)
         return LinkResponse.model_validate(url_data)
     except AlreadyExists:
-        raise HTTPException(500, "Error short url create")
+        raise HTTPException(409, "Error short url create")
 
 @router.get("/short_url", status_code=status.HTTP_200_OK)
 async def get_short_urls(

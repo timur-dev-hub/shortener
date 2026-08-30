@@ -27,7 +27,7 @@ async def registration(
     except AlreadyExists:
         raise HTTPException(status_code=409, detail="Unable to create account")
 
-@router.post("/login", status_code=status.HTTP_201_CREATED)
+@router.post("/login", status_code=status.HTTP_200_OK)
 async def login(
         login_data: UserLogin,
         response: Response,

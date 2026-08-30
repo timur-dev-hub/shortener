@@ -1,4 +1,3 @@
-import jwt
 from fastapi import Depends
 from authx import TokenPayload
 from uuid import UUID

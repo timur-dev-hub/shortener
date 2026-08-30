@@ -1,4 +1,4 @@
-from sqlalchemy import select, delete, update
+from sqlalchemy import select, delete, update, case
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
 
@@ -40,11 +40,16 @@ async def get_target_url_by_short_code(session: AsyncSession, short_code: ShortC
     result = result.scalars().one_or_none()
     return result
 
-async def add_click_by_short_code(session: AsyncSession, short_code: ShortCode) -> None:
+async def upd_click_by_short_code(session: AsyncSession, clicks: dict[ShortCode, int]) -> None:
     stmt = (
         update(Url)
-        .where(Url.short_code == short_code)
-        .values(clicks=Url.clicks + 1)
+        .where(Url.short_code.in_(clicks))
+        .values(
+            clicks=Url.clicks + case(
+                clicks,
+                value=Url.short_code
+            )
+        )
     )
 
     await session.execute(stmt)

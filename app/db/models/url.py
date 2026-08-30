@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import UUID, ForeignKey
-from datetime import datetime
+from datetime import datetime, timezone
 
 from app.db.database import Base
 
@@ -18,6 +18,6 @@ class Url(Base):
 
     target_url: Mapped[str]
     short_code: Mapped[str] = mapped_column(unique=True)
-    created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(default=datetime.now(timezone.utc))
     clicks: Mapped[int] = mapped_column(default=0)
 

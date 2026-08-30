@@ -28,8 +28,8 @@ class RedisCache:
     async def get_click_by_short_code(self, short_code: list[str]) -> list:
         async with self.redis.pipeline(transaction=True) as pipe:
             for code in short_code:
-                await pipe.get(f"{self.__clicks_prefix}{code.split(":")[1]}")
-                await pipe.delete(f"{self.__clicks_prefix}{code.split(":")[1]}")
+                pipe.get(f"{self.__clicks_prefix}{code.split(":")[1]}")
+                pipe.delete(f"{self.__clicks_prefix}{code.split(":")[1]}")
 
 
             results = await pipe.execute()

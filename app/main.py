@@ -6,24 +6,24 @@ from app.api.shortener import router as shortener_router
 from app.api.shortener import redirect_router as redirect_router
 
 app = FastAPI(
-    title="Укоротитель ссылок",
+    title="Link shortener",
     version="0.0.1"
 )
 
 app.include_router(
     user_router,
     prefix="/api/v1/auth",
-    tags=["Регистрация и авторизация"]
+    tags=["Registration and authorization"]
 )
 app.include_router(
     shortener_router,
     prefix="/api/v1",
-    tags=["Робота с сылками"]
+    tags=["Working with links"]
 )
 app.include_router(
     redirect_router,
     prefix="/r",
-    tags=["Робота с сылками"]
+    tags=["redirection"]
 )
 
 

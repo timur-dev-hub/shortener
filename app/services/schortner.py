@@ -16,7 +16,7 @@ from app.cache.cache import Redis_Cache
 from app.schemas.schortener import LinkCreate, ShortCode
 from app.core.exceptions import AlreadyExists, NotFound
 
-async def generate_code(length: int = 12) -> str:
+def generate_code(length: int = 12) -> str:
     characters = string.ascii_letters + string.digits
     return ''.join(random.choices(characters, k=length))
 
@@ -30,7 +30,7 @@ async def create_short_link(session: AsyncSession, link: LinkCreate, user_id: UU
 
     for _ in range(10):
 
-        short_code = await generate_code()
+        short_code = generate_code()
 
         try:
             url = Url(

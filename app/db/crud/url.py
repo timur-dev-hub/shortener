@@ -6,7 +6,7 @@ from uuid import UUID
 
 from app.db.models.url import Url
 
-from app.schemas.schortener import ShortCode
+from app.schemas.shortener import ShortCode
 
 
 async def create_entry_short_url(session: AsyncSession, url: Url) -> Url:

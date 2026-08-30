@@ -13,7 +13,7 @@ from app.db.crud.url import (create_entry_short_url, get_target_url_by_short_cod
 
 from app.cache.cache import Redis_Cache
 
-from app.schemas.schortener import LinkCreate, ShortCode
+from app.schemas.shortener import LinkCreate, ShortCode
 from app.core.exceptions import AlreadyExists, NotFound
 
 def generate_code(length: int = 12) -> str:

@@ -5,9 +5,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from uuid import UUID
 
 from app.api.dependencies import get_current_user_id, get_session
-from app.schemas.schortener import LinkCreate, LinkResponse, ShortCode, UrlsResponse
+from app.schemas.shortener import LinkCreate, LinkResponse, ShortCode, UrlsResponse
 
-from app.services.schortner import create_short_link, redirect_url, get_all_short_urls, delete_redirect_url
+from app.services.shortener import create_short_link, redirect_url, get_all_short_urls, delete_redirect_url
 from app.core.exceptions import AlreadyExists, NotFound
 
 router = APIRouter()

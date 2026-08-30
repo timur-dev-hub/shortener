@@ -7,8 +7,14 @@ from app.workers.clicks import clicks_synchronization
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     print("app started")
-    asyncio.create_task(clicks_synchronization())
+    task = asyncio.create_task(clicks_synchronization())
 
     yield
+
+    task.cancel()
+    try:
+        await task
+    except asyncio.CancelledError:
+        pass
 
     print("app ended")

@@ -12,7 +12,7 @@ from app.core.exceptions import InvalidUserData, AlreadyExists
 
 router = APIRouter()
 
-@router.post("/registration", status_code=status.HTTP_200_OK)
+@router.post("/registration", status_code=status.HTTP_201_CREATED)
 async def registration(
         register_data: UserRegister,
         response: Response,

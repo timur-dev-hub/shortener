@@ -58,5 +58,5 @@ class RedisCache:
         # (0, [{'MZKlhF9yXYJW': 2}, ...])
         return cursor, clicks_count
 
-Redis_Cache = RedisCache(client)
+redis_cache = RedisCache(client)
 

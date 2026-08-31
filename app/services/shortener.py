@@ -11,7 +11,7 @@ from app.db.crud.url import (create_entry_short_url, get_target_url_by_short_cod
                              get_all_short_urls_by_user_id, check_exist_target_url,
                              delete_entry_short_url)
 
-from app.cache.cache import Redis_Cache
+from app.cache.cache import redis_cache
 
 from app.schemas.shortener import LinkCreate, ShortCode
 from app.core.exceptions import AlreadyExists, NotFound
@@ -47,7 +47,7 @@ async def create_short_link(session: AsyncSession, link: LinkCreate, user_id: UU
 
 async def redirect_url(session: AsyncSession, short_code: ShortCode) -> str:
 
-    url = await Redis_Cache.get_url(short_code)
+    url = await redis_cache.get_url(short_code)
     if url:
         return url
 
@@ -55,7 +55,7 @@ async def redirect_url(session: AsyncSession, short_code: ShortCode) -> str:
     if not url_data:
         raise NotFound
 
-    await Redis_Cache.set_url(short_code, url_data.target_url)
+    await redis_cache.set_url(short_code, url_data.target_url)
     return url_data.target_url
 
 
@@ -69,7 +69,7 @@ async def delete_redirect_url(session: AsyncSession, short_code: ShortCode, user
 
     result = await delete_entry_short_url(session, short_code, user_id)
 
-    await Redis_Cache.delete_url(short_code)
+    await redis_cache.delete_url(short_code)
 
     if not result:
         raise NotFound

@@ -12,15 +12,12 @@ from app.core.exceptions import InvalidUserData, AlreadyExists
 password_hash = PasswordHash.recommended()
 
 
-async def get_hashed_password(password: str) -> PasswordHash:
-    return password_hash.hash(password)
-
 async def register_user(
     session: AsyncSession,
     data: UserRegister
 ):
 
-    hashed_password = await get_hashed_password(data.password)
+    hashed_password = password_hash.hash(data.password)
     data_user = User(
         username=data.username,
         password=hashed_password,

@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from core.lifespan import lifespan
+from app.core.lifespan import lifespan
 
 from app.api.users import router as user_router
 from app.api.shortener import router as shortener_router

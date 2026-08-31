@@ -58,4 +58,4 @@ async def redirect(
 
         return RedirectResponse(url=url)
     except NotFound:
-        return RedirectResponse(url="/")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)

@@ -1,7 +1,11 @@
+import logging
+
 from app.cache.cache import redis_cache
 from app.db.crud.url import upd_click_by_short_code
 
 from app.db.database import async_session
+
+logger = logging.getLogger(__name__)
 
 async def redis_clicks_synchronization():
     cursor, clicks_count = await redis_cache.get_clicks_by_cursor()
@@ -21,3 +25,5 @@ async def redis_clicks_synchronization():
 
     async with async_session() as session:
         await upd_click_by_short_code(session, clicks)
+
+    logger.debug(f"Redis clicks synchronization: {clicks_count}")

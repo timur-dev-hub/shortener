@@ -29,7 +29,7 @@ async def register_user(
 
     try:
         user = await create_user(session, data_user)
-        logger.info(f"Created new user")
+        logger.info(f"Created new user | user_id: {user.id}")
         return user
     except IntegrityError:
         logger.info(f"User already exists")
@@ -49,7 +49,7 @@ async def login_user(
         raise InvalidUserData
 
     if password_hash.verify(input_data.password, user.password):
-        logger.info("User logged in")
+        logger.info(f"User logged in | user_id: {user.id}")
         return user
     else:
         logger.info("User login failed")

@@ -1,13 +1,20 @@
 import asyncio
+import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
+
 from app.workers.clicks import clicks_synchronization
+from app.core.logger import setup_logging
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    print("app started")
+
+    setup_logging()
+    logger = logging.getLogger(__name__)
+
     task = asyncio.create_task(clicks_synchronization())
+    logger.info("App started")
 
     yield
 
@@ -16,5 +23,4 @@ async def lifespan(app: FastAPI):
         await task
     except asyncio.CancelledError:
         pass
-
-    print("app ended")
+    logger.info("App ended")

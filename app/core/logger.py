@@ -17,7 +17,7 @@ def setup_logging():
 
     # FILE
     rotating_file_handler = TimedRotatingFileHandler(
-        'app.log',
+        'logs/app.log',
         when="midnight",
         interval=1,
         backupCount=7,

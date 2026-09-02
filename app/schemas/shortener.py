@@ -16,6 +16,7 @@ class LinkResponse(BaseModel):
     id: int
     target_url: HttpUrl
 
+    # We are removing the field from the output, it is needed only to construct the full link
     short_code: str = Field(exclude=True)
 
     created_at: datetime

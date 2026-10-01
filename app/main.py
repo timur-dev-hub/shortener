@@ -8,7 +8,7 @@ from app.api.shortener import redirect_router as redirect_router
 
 app = FastAPI(
     title="Link shortener",
-    version="0.0.1",
+    version="1.0.0",
     lifespan=lifespan,
 )
 
@@ -30,9 +30,9 @@ app.include_router(
 
 
 
-@app.get("/")
+@app.get("/health")
 async def root():
-    return {"message": "Hello World"}
+    return {"status": "ok", "version": "1.0.0"}
 
 
 if __name__ == '__main__':

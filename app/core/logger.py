@@ -1,4 +1,5 @@
 import logging
+from pathlib import Path
 from logging.handlers import TimedRotatingFileHandler
 
 
@@ -6,6 +7,11 @@ def setup_logging():
 
     root_logger = logging.getLogger()
     root_logger.setLevel(logging.DEBUG)
+
+    base_der = Path(__file__).resolve().parent.parent
+    log_dir = base_der / 'logs'
+
+    log_dir.mkdir(parents=True, exist_ok=True)
 
     # HANDLERS
 
@@ -17,7 +23,7 @@ def setup_logging():
 
     # FILE
     rotating_file_handler = TimedRotatingFileHandler(
-        'app.log',
+        filename= log_dir / 'app.log',
         when="midnight",
         interval=1,
         backupCount=7,

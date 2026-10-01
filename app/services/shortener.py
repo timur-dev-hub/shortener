@@ -43,7 +43,7 @@ async def create_short_link(session: AsyncSession, link: LinkCreate, user_id: UU
                 short_code=short_code
             )
             short_url_entry = await create_entry_short_url(session, url)
-            logger.info(f"User: {user_id} creating short url | target: {target_url} short_code: {short_url}")
+            logger.info(f"User: {user_id} creating short url | short_code: {short_code}")
             return short_url_entry
 
         except IntegrityError:

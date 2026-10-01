@@ -47,7 +47,7 @@ class RedisCache:
         for i in range(len(short_code)):
 
             code = short_code[i].split(":")[1]
-            click = int(clicks[i])
+            click = int(clicks[i] or 0) # skipping the remote link due to a race condition
 
             click_data = {
                 code: click

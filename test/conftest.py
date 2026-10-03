@@ -43,6 +43,24 @@ async def setup_db():
     async with test_engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
 
+
+from app.cache import cache
+from app.cache.redis_client import get_redis_client
+from app.cache.cache import RedisCache
+import app.services.shortener as shortener
+
+@pytest_asyncio.fixture(autouse=True)
+async def setup_redis():
+    client = get_redis_client()
+    new_redis_cache = RedisCache(client)
+
+    cache.redis_cache = new_redis_cache
+    shortener.redis_cache = new_redis_cache
+
+    yield
+
+    await client.aclose()
+
 async def override_get_session():
     async with test_async_session() as session:
         yield session

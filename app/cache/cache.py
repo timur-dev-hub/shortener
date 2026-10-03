@@ -1,6 +1,6 @@
 from redis.asyncio import Redis
 
-from app.cache.redis_client import client
+from app.cache.redis_client import get_redis_client
 
 class RedisCache:
     def __init__(self, redis: Redis):
@@ -58,5 +58,6 @@ class RedisCache:
         # (0, [{'MZKlhF9yXYJW': 2}, ...])
         return cursor, clicks_count
 
+client = get_redis_client()
 redis_cache = RedisCache(client)
 

@@ -41,3 +41,19 @@ async def test_delete_redirect():
 
         res = await client.delete(f"/api/v1/short_url?short_code={short_code}")
         assert res.status_code == 204
+
+
+@pytest.mark.asyncio
+async def test_redirect():
+
+    async with AsyncClient(transport=ASGITransport(app=app),
+                           base_url="http://test") as client:
+
+        create_url_res = await client.post("/api/v1/short_url", json={"target_url": "https://docs.pytest.org/en/stable/"})
+        assert create_url_res.status_code == 201
+
+        short_code = create_url_res.json()["short_url"][-12:]
+
+        res = await client.get(f"/r/{short_code}")
+
+        assert res.status_code == 307

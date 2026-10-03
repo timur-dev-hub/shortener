@@ -1,11 +1,12 @@
 import pytest_asyncio
+from uuid import UUID
 
 from sqlalchemy.pool import NullPool
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from app.core.config import settings
 
 from app.main import app
-from app.api.dependencies import get_session
+from app.api.dependencies import get_session, get_current_user_id
 
 from app.db.database import Base
 from app.db.models.user import User
@@ -13,6 +14,9 @@ from app.db.models.url import Url
 
 test_engine = create_async_engine(settings.database_url, echo=False, poolclass=NullPool)
 test_async_session = async_sessionmaker(test_engine, expire_on_commit=False)
+
+
+TEST_USER_ID = UUID("00000000-0000-0000-0000-000000000001")
 
 @pytest_asyncio.fixture(scope="session", autouse=True)
 async def setup_db():
@@ -22,6 +26,17 @@ async def setup_db():
     async with test_engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
+
+    async with test_async_session() as session:
+        test_user = User(
+            id=TEST_USER_ID,
+            username="test_user_1",
+            email="test_1@example.com",
+            password="hashed_password_1",
+        )
+
+        session.add(test_user)
+        await session.commit()
 
     yield
 
@@ -34,3 +49,10 @@ async def override_get_session():
 
 
 app.dependency_overrides[get_session] = override_get_session
+
+
+
+async def override_get_current_user_id() -> UUID:
+    return TEST_USER_ID
+
+app.dependency_overrides[get_current_user_id] = override_get_current_user_id

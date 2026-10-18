@@ -229,3 +229,5 @@ test.py
 init.py
 timetest.py
 front-end/
+
+.env.test

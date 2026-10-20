@@ -1,0 +1,29 @@
+services:
+
+  test-db:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: ${DB_NAME:?Set DB_NAME in .env.test}
+      POSTGRES_USER: ${DB_USER:?Set DB_USER in .env.test}
+      POSTGRES_PASSWORD: ${DB_PASS:?Set DB_PASS in .env.test}
+
+    ports:
+      - "${DB_PORT:?Set_DB_PORT}:5432"
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  test-redis:
+    image: redis:7-alpine
+    ports:
+      - "${REDIS_PORT:?Set_REDIS_PORT}:6379"
+
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
